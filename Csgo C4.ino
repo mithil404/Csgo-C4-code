@@ -1,4 +1,3 @@
-#include<LiquidCrystal.h>
 #include<Keypad.h>
 #include<string.h>
 int i=0;
