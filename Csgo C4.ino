@@ -1,6 +1,6 @@
-  #include<LiquidCrystal.h>
-  #include<Keypad.h>
-  #include<string.h>
+  #include <LiquidCrystal.h>
+  #include <Keypad.h>
+
   int i=0;
   int var;
   int arrow;
@@ -14,6 +14,28 @@
   bool defusing;
   int nokit=10; //no defuse kit purchased time: 10 seconds
   int defkit=5; //defuse kit purchased time: 5 seconds
+
+  byte arrow_dw[8] = {
+	0b00000,
+	0b00000,
+	0b00000,
+	0b00000,
+	0b00000,
+	0b11111,
+	0b01110,
+	0b00100
+  };
+
+  byte arrow_up[8] = {
+	0b00100,
+	0b01110,
+	0b11111,
+	0b00000,
+	0b00000,
+	0b00000,
+	0b00000,
+	0b00000
+};
 
   LiquidCrystal lcd(19, 21, 3, 1, 22, 23);
   const byte ROWS=4;
@@ -97,26 +119,38 @@
       lcd.print("*Game time");
       lcd.setCursor(0,1);
       lcd.print(" Arm time");
+      lcd.setCursor(15,1);
+      lcd.write((uint8_t)1);
       break;
       case 2:
       cls();
       if(arrow==bt_dw)
       {
       lcd.print(" Game time");
+      lcd.setCursor(15,0);
+      lcd.write((uint8_t)0);
       lcd.setCursor(0,1);
       lcd.print("*Arm time");
+      lcd.setCursor(15,1);
+      lcd.write((uint8_t)1);
       }
       else if(arrow==bt_up)
       {
       cls();
       lcd.print("*Arm time");
+      lcd.setCursor(15,0);
+      lcd.write((uint8_t)0);
       lcd.setCursor(0,1);
       lcd.print(" Bomb time");
+      lcd.setCursor(15,1);
+      lcd.write((uint8_t)1);
       }
       break;
       case 3:
       cls();
       lcd.print(" Arm time");
+      lcd.setCursor(15,0);
+      lcd.write((uint8_t)0);
       lcd.setCursor(0,1);
       lcd.print("*Bomb time");
       break;
@@ -238,6 +272,9 @@
     pinMode(RED, OUTPUT); //RED
     pinMode(GREEN, OUTPUT); //GREEN
     pinMode(BUZZER, OUTPUT); //BUZZER
+
+    lcd.createChar(0, arrow_up);
+    lcd.createChar(1, arrow_dw);
   }
 
   void loop() // put your main code here, to run repeatedly: 
