@@ -4,8 +4,8 @@
   int i=0;
   int var;
   int arrow;
-  int game_time_min=1, game_time_sec=55;
-  char buff_gmin[3], buff_gsec[3];
+  int game_time_min=1, game_time_sec=55, arm_time_sec=3, bomb_time_min=0, bomb_time_sec=40;
+  char buff_gmin[3], buff_gsec[3], buff_asec[3], buff_bmin[3], buff_bsec[3];
   int game_arr[4]={0,0,0,0};
   const int YELLOW=13; //led pins:
   const int RED=12; //led pins:
@@ -81,33 +81,16 @@
     lcd.setCursor(0,0);
   }
   char pass[7];
-  // struct menu1
-  // {
-  //   char* name="Game Time";
-  //   struct time
-  //   {
-  //     int minutes=1, seconds=55;
-  //   }game_time;
-  // }option1;
-  // struct menu2
-  // {
-  //   char* name="Arm Time";
-  //   int seconds=3;
-  // }option2;
-  // struct menu3
-  // {
-  //   char* name="Bomb Time";
-  //   struct time
-  //   {
-  //     int minutes=0, seconds=40;
-  //   }bomb_time;
-  // }option3;
 
   void bufferize()
   {
     // Buffer to hold the formatted number (including null terminator)
     sprintf(buff_gmin, "%02d", game_time_min);
     sprintf(buff_gsec, "%02d", game_time_sec);
+    sprintf(buff_asec, "%02d", arm_time_sec);
+    sprintf(buff_bmin, "%02d", bomb_time_min);
+    sprintf(buff_bsec, "%02d", bomb_time_sec);
+
   }
 
   void display(int n)
@@ -179,7 +162,7 @@
       {
         if(cnt==1)
         {
-        input:
+        input1:
           int cnt1=0;
           cls();
           lcd.print(buff_gmin);
@@ -204,7 +187,7 @@
                 var=keypad.waitForKey();
                 if(var=='*')
                 {
-                  goto panic;
+                  goto panic1;
                 }
                 else if(var=='#')
                 {
@@ -244,16 +227,174 @@
           game_time_min = min;
           game_time_sec = sec;
           bufferize();
+          cls();
+          lcd.setCursor(4,0);
+          lcd.print("Changed!");
+          delay(1000);
           break;
           }
           else if(var=='*'){
-            goto input;
+            goto input1;
           }
           continue;
-          panic:
+          panic1:
+          cls();
+          lcd.setCursor(3,0);
+          lcd.print("Cancelled!");
+          delay(1000);
           break;
         }
 
+        else if(cnt==2)
+        {
+        input2:
+          int cnt1=0;
+          cls();
+          lcd.print(buff_asec);
+          lcd.print(" Seconds");
+          while(cnt1<=1)
+          {
+              
+                lcd.setCursor(cnt1,1);
+                lcd.print("-");
+            
+              while(1){
+                var=keypad.waitForKey();
+                if(var=='*')
+                {
+                  goto panic2;
+                }
+                else if(var=='#')
+                {
+                  continue;
+                }
+                else
+                  {
+                    break;
+                  }
+              }
+              
+              game_arr[cnt1]=var-48;
+              cls();
+              lcd.print(game_arr[0]);
+              lcd.print(game_arr[1]);
+              lcd.print(" Seconds");
+              cnt1++;
+          }
+          lcd.setCursor(0,1);
+          lcd.print("Re(*)");
+          lcd.print("    Cnfm(#)");
+
+          var=keypad.waitForKey();
+          if(var=='#'){
+
+            // Parse Time
+          int sec = game_arr[0]*10 + game_arr[1];
+
+          arm_time_sec = sec;
+          bufferize();
+          cls();
+          lcd.setCursor(4,0);
+          lcd.print("Changed!");
+          delay(1000);
+          break;
+          }
+          else if(var=='*'){
+            goto input2;
+          }
+          continue;
+          panic2:
+          cls();
+          lcd.setCursor(3,0);
+          lcd.print("Cancelled!");
+          delay(1000);
+          break;
+        }
+
+        if(cnt==3)
+        {
+        input3:
+          int cnt1=0;
+          cls();
+          lcd.print(buff_bmin);
+          lcd.print(":");
+          lcd.print(buff_bsec);
+          lcd.print("    MM:SS");
+          while(cnt1<=3)
+          {
+              
+              if(cnt1<=1)
+              {
+                lcd.setCursor(cnt1,1);
+                lcd.print("-");
+              }
+              else
+              {
+                lcd.setCursor((cnt1+1),1);
+                lcd.print("-");
+              }
+            
+              while(1){
+                var=keypad.waitForKey();
+                if(var=='*')
+                {
+                  goto panic3;
+                }
+                else if(var=='#')
+                {
+                  continue;
+                }
+                else if(cnt1==2 && var>='6')
+                {
+                  continue;
+                }
+                else
+                  {
+                    break;
+                  }
+              }
+              
+              game_arr[cnt1]=var-48;
+              cls();
+              lcd.print(game_arr[0]);
+              lcd.print(game_arr[1]);
+              lcd.print(":");
+              lcd.print(game_arr[2]);
+              lcd.print(game_arr[3]);
+              lcd.print("    MM:SS");
+              cnt1++;
+          }
+          lcd.setCursor(0,1);
+          lcd.print("Re(*)");
+          lcd.print("    Cnfm(#)");
+
+          var=keypad.waitForKey();
+          if(var=='#'){
+
+            // Parse Time
+          int min = game_arr[0]*10 + game_arr[1];
+          int sec = game_arr[2]*10 + game_arr[3];
+
+          bomb_time_min = min;
+          bomb_time_sec = sec;
+          bufferize();
+          cls();
+          lcd.setCursor(4,0);
+          lcd.print("Changed!");
+          delay(1000);
+          break;
+          }
+          else if(var=='*'){
+            goto input3;
+          }
+          continue;
+          panic3:
+          cls();
+          lcd.setCursor(3,0);
+          lcd.print("Cancelled!");
+          delay(1000);
+          break;
+        }
         
       }
     }
